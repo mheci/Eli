@@ -43,8 +43,7 @@ unity_rpm="UnityHubSetup-${unity_version}-x86_64.rpm"
 curl -fsSL -o "$tmp/$unity_rpm" "https://public-cdn.cloud.unity3d.com/hub/prod/${unity_version}/${unity_rpm}"
 echo "${unity_sha}  $tmp/$unity_rpm" | sha256sum -c -
 # shortcut: the RPM %posttrans hangs in the build (it adds Unity's update repo
-# and runs yum check-update), so it is skipped. Hub self-update stays off; the
-# app is not launched in CI.
+# and runs yum check-update), so it is skipped. The app is not launched in CI.
 timeout 600 dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
 rpm -q unityhub
 

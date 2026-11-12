@@ -77,7 +77,7 @@ setup: setup-groups setup-kdeconnect
 # Install Android Studio and set up adb, udev rules and KVM access.
 setup-android-studio:
     #!/usr/bin/env bash
-    # shortcut: pinned for checksum; bump version, URL and SHA together. A newer
+    # shortcut: pinned for checksum; bump version, build, URL and SHA together. A newer
     # local install is replaced by this pin.
     set -euo pipefail
 
@@ -85,15 +85,13 @@ setup-android-studio:
     trap 'rm -rf "$tmp"' EXIT
 
     version="2026.2.2.9"
+    build="AI-262.10968.63.2622.16840690"
     url="https://edgedl.me.gvt1.com/android/studio/ide-zips/${version}/android-studio-rabbit2-patch1-linux.tar.gz"
     sha="11ecbf0e6dc0f04a1353f797e45bf239a3ff1a82221539b1b8cdd7eab0d8d8ea"
 
-    installed=""
-    if [ -f "$HOME/.local/opt/android-studio/product-info.json" ]; then
-        installed="$(jq -r '.version' "$HOME/.local/opt/android-studio/product-info.json" 2>/dev/null || true)"
-    fi
+    installed="$(cat "$HOME/.local/opt/android-studio/build.txt" 2>/dev/null || true)"
 
-    if [ "$installed" = "$version" ]; then
+    if [ "$installed" = "$build" ]; then
         echo "Android Studio $version is already installed."
     else
         echo "Downloading Android Studio $version..."
