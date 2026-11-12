@@ -1,0 +1,13 @@
+[Unit]
+Description=Blocky DNS proxy
+Documentation=https://0xerr0r.github.io/blocky/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/blocky --config /etc/blocky/config.yml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

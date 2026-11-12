@@ -54,6 +54,14 @@ modules:
         - kdeconnectd
         - qbittorrent
         - wireshark
+        - kio-fuse
+        - kio-extras
+        - ffmpegthumbnailer
+        - pcmanfm-qt
+        - gvfs
+        - gvfs-mtp
+        - make
+        - rsync
         # Terra packages
         - zed
         - ghostty
@@ -62,6 +70,7 @@ modules:
         - mise
         - faugus-launcher
         - t3code
+        - bpftune
         # Steam needs the 32-bit libfdk-aac; the base only ships the 64-bit one
         - libfdk-aac.i686
         # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
@@ -74,6 +83,11 @@ modules:
       install-weak-deps: false # matches Bazzite's Steam install
       packages:
         - steam
+
+  - type: systemd
+    system:
+      enabled:
+        - bpftune.service
 
   - type: default-flatpaks
     configurations:

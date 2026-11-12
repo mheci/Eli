@@ -44,6 +44,35 @@ setup-noise-suppression:
     systemctl --user restart pipewire.service wireplumber.service
     echo "Restarted PipeWire. Select 'Noise Canceling source' as your microphone."
 
+# Set up profile-sync-daemon for the current user.
+setup-psd:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v psd >/dev/null; then
+        echo "profile-sync-daemon is not installed."
+        exit 1
+    fi
+    sudo psd setup
+    systemctl --user enable --now psd.service
+    echo "profile-sync-daemon is enabled for $USER."
+
+# Enable the Blocky DNS proxy if port 53 is free.
+setup-blocky:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v blocky >/dev/null; then
+        echo "Blocky is not installed."
+        exit 1
+    fi
+    if ss -ltnH 'sport = :53' | grep -q .; then
+        echo "Port 53 is already in use:"
+        ss -ltnp 'sport = :53'
+        echo "Free it (for example, disable the systemd-resolved stub listener) before enabling Blocky."
+        exit 1
+    fi
+    sudo systemctl enable --now blocky.service
+    echo "Blocky is running on port 53. Point your DNS at 127.0.0.1."
+
 # Run every runtime setup step once.
 setup: setup-groups setup-kdeconnect setup-flatpaks
 

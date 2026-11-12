@@ -20,6 +20,19 @@ spotifast_tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.c
 dnf install -y "https://github.com/crmne/spotifast/releases/download/${spotifast_tag}/spotifast-${spotifast_tag#v}-1.x86_64.rpm"
 rpm -q spotifast
 
+# Blocky DNS proxy.
+blocky_tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/0xERR0R/blocky/releases/latest | sed 's|.*/tag/||')"
+mkdir -p "$tmp/blocky"
+curl -fsSL -o "$tmp/blocky.tgz" "https://github.com/0xERR0R/blocky/releases/download/${blocky_tag}/blocky_${blocky_tag}_Linux_x86_64.tar.gz"
+tar -xzf "$tmp/blocky.tgz" -C "$tmp/blocky"
+install -Dm755 "$tmp/blocky/blocky" /usr/bin/blocky
+
+# profile-sync-daemon (not packaged for Fedora 45).
+curl -fsSL -o "$tmp/psd.tar.gz" "https://github.com/graysky2/profile-sync-daemon/archive/refs/tags/v8.0.tar.gz"
+tar -xzf "$tmp/psd.tar.gz" -C "$tmp"
+psd_dir="$(find "$tmp" -maxdepth 1 -type d -name 'profile-sync-daemon-*' -print -quit)"
+make -C "$psd_dir" install
+
 # The base image ships blujust, not ujust; expose the same recipes under both names.
 if [[ ! -x /usr/bin/ujust && -x /usr/bin/blujust ]]; then
     printf '#!/usr/bin/env bash\nexec /usr/bin/blujust "$@"\n' > /usr/bin/ujust
