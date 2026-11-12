@@ -1,12 +1,12 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 # image will be published to ghcr.io/<user>/<name>
-name: template
+name: eli
 # description will be included in the image's metadata
-description: This is my personal OS image.
+description: Personal Fedora Kinoite image with NVIDIA open drivers and dev tooling.
 
 # the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
+base-image: ghcr.io/blue-build/base-images/fedora-kinoite-nvidia-open
 image-version: latest # You can pin to a specific version of Fedora as well
 
 # module configuration, executed in order
@@ -19,27 +19,29 @@ modules:
 
   - type: dnf
     repos:
-      copr:
-        - atim/starship
+      keys:
+        # needed to verify the Unity Hub RPM signature
+        - https://hub.unity3d.com/linux/repos/rpm/stable/repodata/repomd.xml.key
     install:
       packages:
-        - micro
-        - starship
-    remove:
-      packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+        - nodejs
+        - npm
+        # stable URLs that always resolve to the latest release
+        - https://hub-dist.unity3d.com/artifactory/hub-rpm-prod-local/unity/stable/unityhub_x86_64/UnityHubSetup-x86_64.rpm
+        - https://github.com/anomalyco/opencode/releases/latest/download/opencode-desktop-linux-x86_64.rpm
 
   - type: default-flatpaks
     configurations:
       - notify: true # Send notification after install/uninstall is finished (true/false)
         scope: system
         # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - org.gnome.Loupe
+        install:
+          - dev.zed.Zed
       - scope: user # Also add Flathub user repo, but no user packages
+
+  - type: script
+    snippets:
+      - npm install -g @anthropic-ai/claude-code @openai/codex
+      - claude --version && codex --version # fail the build if the CLIs are not on PATH
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
