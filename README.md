@@ -11,8 +11,9 @@ Preinstalled:
 - Terminals: [Ghostty](https://ghostty.org) (Terra), [Kitty](https://sw.kovidgoyal.net/kitty/)
 - Editor: [Zed](https://zed.dev) (Terra)
 - Dev: [OpenCode Desktop](https://opencode.ai/desktop), [Claude Code](https://claude.com/claude-code),
-  [Codex](https://github.com/openai/codex), [Bun](https://bun.sh), [Deno](https://deno.com),
-  [uv](https://docs.astral.sh/uv/), [mise](https://mise.jdx.dev)
+  [Codex](https://github.com/openai/codex), [T3 Code](https://github.com/pingdotgg/t3code) (Terra),
+  [Bun](https://bun.sh), [Deno](https://deno.com), [uv](https://docs.astral.sh/uv/),
+  [mise](https://mise.jdx.dev)
 - Gaming: [Steam](https://store.steampowered.com) (Terra),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)

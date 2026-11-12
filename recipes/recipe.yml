@@ -29,11 +29,15 @@ modules:
       # Bazzite's setup: negativo17 provides the 32-bit libfdk-aac that Steam needs
       nonfree: negativo17
     install:
+      exclude:
+        - azure-cli # t3code suggests these; both are too heavy to pull implicitly
+        - glab
       packages:
         # Fedora packages Terra doesn't carry
         - nodejs
         - npm
         - git
+        - gh
         - jq
         - unzip # extracts the RNNoise release zip
         - libatomic # Hermes' managed Node links this
@@ -57,6 +61,7 @@ modules:
         - deno
         - mise
         - faugus-launcher
+        - t3code
         # Steam needs the 32-bit libfdk-aac; the base only ships the 64-bit one
         - libfdk-aac.i686
         # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
