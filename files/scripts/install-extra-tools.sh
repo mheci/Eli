@@ -44,7 +44,7 @@ curl -fsSL -o "$tmp/$unity_rpm" "https://public-cdn.cloud.unity3d.com/hub/prod/$
 echo "${unity_sha}  $tmp/$unity_rpm" | sha256sum -c -
 # shortcut: the RPM %posttrans hangs in the build (it adds Unity's update repo
 # and runs yum check-update), so it is skipped. The app is not launched in CI.
-timeout 600 dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
+dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
 rpm -q unityhub
 
 # Blocky DNS proxy.

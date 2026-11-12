@@ -45,10 +45,11 @@ Android development:
 ujust setup-android-studio
 ```
 
-Installs Android Studio 2026.2.2.9 (pinned for its checksum; bump the recipe to update), creates the
-`studio` launcher and desktop entry, and adds you to the `adbusers` and `kvm` groups. The image already ships
-`android-tools`, the Android udev rules, and KVM support, so no layering or reboot is needed; log out
-and back in for the groups to apply. The SDK wizard installs the SDK to `~/Android/Sdk`.
+Installs Android Studio 2026.2.2.9 (pinned for its checksum; bump version, build, URL and SHA
+together; an in-IDE update is replaced by the pin), creates the `studio` launcher and desktop entry,
+and adds you to the `adbusers` and `kvm` groups. The image already ships `android-tools`, the Android
+udev rules, and KVM support, so no layering or reboot is needed; log out and back in for the groups to
+apply. The SDK wizard installs the SDK to `~/Android/Sdk`.
 
 AI agents:
 

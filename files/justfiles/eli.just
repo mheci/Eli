@@ -101,6 +101,7 @@ setup-android-studio:
         mkdir -p "$tmp/extract"
         tar -xzf "$tmp/studio.tar.gz" -C "$tmp/extract"
         [ -d "$tmp/extract/android-studio" ] || { echo "Unexpected Android Studio archive layout."; exit 1; }
+        [ "$(cat "$tmp/extract/android-studio/build.txt")" = "$build" ] || { echo "Unexpected Android Studio build."; exit 1; }
         rm -rf "$HOME/.local/opt/android-studio"
         mv "$tmp/extract/android-studio" "$HOME/.local/opt/android-studio"
         echo "Installed Android Studio $version."
