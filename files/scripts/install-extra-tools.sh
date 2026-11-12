@@ -23,14 +23,12 @@ echo "${rnnoise_sha}  $tmp/rnnoise.zip" | sha256sum -c -
 unzip -q "$tmp/rnnoise.zip" -d "$tmp/rnnoise"
 install -Dm755 "$tmp/rnnoise/linux-rnnoise/ladspa/librnnoise_ladspa.so" /usr/lib64/ladspa/librnnoise_ladspa.so
 
-# Spotifast ships a native RPM; take the asset name from the release so a
-# release-number bump does not break the URL.
-spotifast_release="$(curl -fsSL https://api.github.com/repos/crmne/spotifast/releases/latest)"
-spotifast_tag="$(jq -r '.tag_name' <<<"$spotifast_release")"
-spotifast_url="$(jq -r 'first(.assets[] | select(.name | test("x86_64\\.rpm$")) | .browser_download_url)' <<<"$spotifast_release")"
-spotifast_name="$(basename "$spotifast_url")"
-curl -fsSL -o "$tmp/$spotifast_name" "$spotifast_url"
-curl -fsSL -o "$tmp/spotifast.sha" "https://github.com/crmne/spotifast/releases/download/${spotifast_tag}/packaging-checksums.txt"
+# Spotifast ships a native RPM; the stable latest-download checksum file names
+# the current x86_64 asset, so no API call is needed.
+curl -fsSL -o "$tmp/spotifast.sha" https://github.com/crmne/spotifast/releases/latest/download/packaging-checksums.txt
+spotifast_name="$(awk '/x86_64\.rpm$/ {gsub(/^\*/, "", $2); print $2; exit}' "$tmp/spotifast.sha")"
+[ -n "$spotifast_name" ] || { echo "Spotifast checksum file has no x86_64 RPM."; exit 1; }
+curl -fsSL -o "$tmp/$spotifast_name" "https://github.com/crmne/spotifast/releases/latest/download/${spotifast_name}"
 (cd "$tmp" && grep " $spotifast_name$" spotifast.sha | sha256sum -c -)
 dnf install -y "$tmp/$spotifast_name"
 rpm -q spotifast
@@ -57,12 +55,19 @@ mkdir -p "$tmp/blocky"
 tar -xzf "$tmp/$blocky_name" -C "$tmp/blocky"
 install -Dm755 "$tmp/blocky/blocky" /usr/bin/blocky
 
-# OpenCode Desktop: take the newest GitHub release that ships the desktop RPM,
-# then verify the matching checksum before installing.
-opencode_release="$(curl -fsSL 'https://api.github.com/repos/anomalyco/opencode/releases?per_page=100' | jq -r 'first(.[] | select(any(.assets[]; .name == "opencode-desktop-linux-x86_64.rpm")))')"
-opencode_tag="$(jq -r '.tag_name' <<<"$opencode_release")"
-opencode_url="$(jq -r 'first(.assets[] | select(.name == "opencode-desktop-linux-x86_64.rpm") | .browser_download_url)' <<<"$opencode_release")"
-curl -fsSL -o "$tmp/opencode-desktop-linux-x86_64.rpm" "$opencode_url"
+# OpenCode Desktop: the newest release often lacks the desktop RPM, so scan the
+# release feed for the first tag that ships it. This avoids the rate-limited API.
+# shortcut: the feed lists the 10 newest releases; if the desktop RPM falls
+# outside that window, pin a version instead.
+opencode_tag=""
+for tag in $(curl -fsSL https://github.com/anomalyco/opencode/releases.atom | grep -oE 'releases/tag/[^"<]+' | sed 's|releases/tag/||'); do
+    if curl -fsIL -o /dev/null -s "https://github.com/anomalyco/opencode/releases/download/${tag}/opencode-desktop-linux-x86_64.rpm"; then
+        opencode_tag="$tag"
+        break
+    fi
+done
+[ -n "$opencode_tag" ] || { echo "No OpenCode release in the feed ships the desktop RPM."; exit 1; }
+curl -fsSL -o "$tmp/opencode-desktop-linux-x86_64.rpm" "https://github.com/anomalyco/opencode/releases/download/${opencode_tag}/opencode-desktop-linux-x86_64.rpm"
 curl -fsSL -o "$tmp/opencode.sha" "https://github.com/anomalyco/opencode/releases/download/${opencode_tag}/SHA256SUMS"
 (cd "$tmp" && grep ' opencode-desktop-linux-x86_64.rpm$' opencode.sha | sha256sum -c -)
 dnf install -y "$tmp/opencode-desktop-linux-x86_64.rpm"
