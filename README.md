@@ -13,16 +13,16 @@ Preinstalled:
 - Dev: [OpenCode Desktop](https://opencode.ai/desktop), [Claude Code](https://claude.com/claude-code),
   [Codex](https://github.com/openai/codex), [Bun](https://bun.sh), [Deno](https://deno.com),
   [uv](https://docs.astral.sh/uv/), [mise](https://mise.jdx.dev)
-- Gaming: [Steam](https://store.steampowered.com) (Flathub),
+- Gaming: [Steam](https://store.steampowered.com) (Terra),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
 - Media: mpv, ffmpeg, yt-dlp, qBittorrent
 - Tools: btop, gdu, nvtop, KDE Connect, Wireshark
 
-The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled, so
-their packages can be layered on later. Steam and Unity Hub stay Flatpaks for two concrete reasons:
-native Steam needs 32-bit pipewire/fdk-aac, which conflicts with the base image's full-codec
-`libfdk-aac`, and Unity's own RPM repository is stuck on 3.15.2 while Flathub ships 3.22.6.
+The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled.
+Steam is installed natively from Terra, with the 32-bit `libfdk-aac` from negativo17 that Bazzite
+also uses. Unity Hub stays a Flatpak because Unity's own RPM repository is stuck on 3.15.2 while
+Flathub ships 3.22.6.
 
 ## Runtime setup
 
