@@ -33,6 +33,11 @@ modules:
         # Fedora packages Terra doesn't carry
         - nodejs
         - npm
+        - git
+        - jq
+        - libatomic # Hermes' managed Node links this
+        - android-tools # adb and fastboot for the Android Studio recipe
+        - qemu-kvm # /dev/kvm and the kvm group for the emulator
         - uv
         - mpv
         - yt-dlp

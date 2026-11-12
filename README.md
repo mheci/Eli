@@ -37,6 +37,26 @@ Connect firewall ports, and applies the configured Flatpaks immediately. Group c
 and back in. The steps are also available separately as `ujust setup-groups`,
 `ujust setup-kdeconnect`, and `ujust setup-flatpaks`.
 
+Android development:
+
+```
+ujust setup-android-studio
+```
+
+Installs the latest stable Android Studio to `~/.local/opt/android-studio`, creates the `studio`
+launcher and desktop entry, and adds you to the `adbusers` and `kvm` groups. The image already ships
+`android-tools`, the Android udev rules, and KVM support, so no layering or reboot is needed; log out
+and back in for the groups to apply. The SDK wizard installs the SDK to `~/Android/Sdk`.
+
+AI agents:
+
+```
+ujust setup-hermes
+```
+
+Installs the [Hermes Agent](https://github.com/NousResearch/hermes-agent) CLI for the current user,
+then prints the command to run its setup wizard.
+
 To capture packets in Wireshark without root, `ujust setup-groups` handles the group membership.
 
 ## Installation
