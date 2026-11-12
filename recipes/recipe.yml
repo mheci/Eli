@@ -49,17 +49,13 @@ modules:
         - kitty
         - btop
         - gdu
-        - nvtop
         - kde-connect
         - kdeconnectd
         - qbittorrent
         - wireshark
         - kio-fuse
         - kio-extras
-        - ffmpegthumbnailer
         - pcmanfm-qt
-        - gvfs
-        - gvfs-mtp
         - make
         - rsync
         # Terra packages
@@ -73,8 +69,6 @@ modules:
         - bpftune
         # Steam needs the 32-bit libfdk-aac; the base only ships the 64-bit one
         - libfdk-aac.i686
-        # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
-        - https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm
 
   - type: dnf
     repos:

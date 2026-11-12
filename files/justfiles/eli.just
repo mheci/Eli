@@ -52,11 +52,12 @@ setup-psd:
         echo "profile-sync-daemon is not installed."
         exit 1
     fi
-    sudo psd setup
+    # The first start writes ~/.config/psd/psd.conf and exits; restart applies it.
     systemctl --user enable --now psd.service
-    echo "profile-sync-daemon is enabled for $USER."
+    systemctl --user restart psd.service
+    echo "profile-sync-daemon is enabled. Edit ~/.config/psd/psd.conf to choose browsers, then run: systemctl --user restart psd.service"
 
-# Enable the Blocky DNS proxy if port 53 is free.
+# Enable the Blocky DNS proxy if ports 53 and 4000 are free.
 setup-blocky:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -64,12 +65,15 @@ setup-blocky:
         echo "Blocky is not installed."
         exit 1
     fi
-    if ss -ltnH 'sport = :53' | grep -q .; then
-        echo "Port 53 is already in use:"
-        ss -ltnp 'sport = :53'
-        echo "Free it (for example, disable the systemd-resolved stub listener) before enabling Blocky."
-        exit 1
-    fi
+    for port in 53 4000; do
+        if ss -ltnH "sport = :$port" | grep -q . || ss -lunH "sport = :$port" | grep -q .; then
+            echo "Port $port is already in use:"
+            ss -ltnp "sport = :$port"
+            ss -lunp "sport = :$port"
+            echo "Free it (for example, disable the systemd-resolved stub listener) before enabling Blocky."
+            exit 1
+        fi
+    done
     sudo systemctl enable --now blocky.service
     echo "Blocky is running on port 53. Point your DNS at 127.0.0.1."
 
@@ -107,8 +111,11 @@ setup-android-studio:
         curl -fL --progress-bar "$url" -o "$tmp/studio.tar.gz"
         echo "$sha  $tmp/studio.tar.gz" | sha256sum -c -
         mkdir -p "$HOME/.local/opt"
+        rm -rf "$tmp/extract"
+        mkdir -p "$tmp/extract"
+        tar -xzf "$tmp/studio.tar.gz" -C "$tmp/extract"
         rm -rf "$HOME/.local/opt/android-studio"
-        tar -xzf "$tmp/studio.tar.gz" -C "$HOME/.local/opt"
+        mv "$tmp/extract/android-studio" "$HOME/.local/opt/android-studio"
         echo "Installed Android Studio $version."
     fi
 

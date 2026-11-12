@@ -68,9 +68,10 @@ Microphone noise suppression is provided by
 
 System services:
 
-- `ujust setup-psd` runs the profile-sync-daemon wizard and enables `psd.service` for your user.
-- `ujust setup-blocky` enables the Blocky DNS proxy on port 53 if the port is free. Edit
-  `/etc/blocky/config.yml` first. Blocky is installed but disabled by default.
+- `ujust setup-psd` enables `psd.service` for your user and creates `~/.config/psd/psd.conf`.
+  Edit that file to choose browsers, then run `systemctl --user restart psd.service`.
+- `ujust setup-blocky` enables the Blocky DNS proxy on 127.0.0.1 if ports 53 and 4000 are free.
+  Edit `/etc/blocky/config.yml` first. Blocky is installed but disabled by default.
 
 To capture packets in Wireshark without root, `ujust setup-groups` handles the group membership.
 
@@ -98,8 +99,8 @@ To rebase an existing atomic Fedora installation to the latest build:
   systemctl reboot
   ```
 
-The `latest` tag will automatically point to the latest build. That build will still always use the
-Fedora version specified in `recipe.yml`, so you won't get accidentally updated to the next major version.
+The `latest` tag points to the latest build. `image-version: latest` also follows the base image's
+current Fedora release, so a new Fedora major version arrives with the base image.
 
 > [!NOTE]
 > The BlueBuild base images sign the kernel and akmods with their own key. If Secure Boot is enabled
