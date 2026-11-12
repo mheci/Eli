@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=SCSKiller
+Comment=Compile game shaders ahead of time to avoid shader compilation stutter
+Exec=/usr/bin/scskiller %U
+Icon=scskiller
+Terminal=false
+Type=Application
+Categories=Utility;Game;

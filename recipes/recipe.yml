@@ -17,13 +17,52 @@ modules:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
 
+  - type: script
+    snippets:
+      # Terra's repo has repo_gpgcheck=1, so the key must be in the rpmdb before dnf reads it
+      - curl -fsSL "https://repos.fyralabs.com/terra$(rpm -E %fedora)/key.asc" | rpm --import -
+
   - type: dnf
+    repos:
+      files:
+        - https://raw.githubusercontent.com/terrapkg/subatomic-repos/main/terra.repo
+      # Bazzite's setup: negativo17 provides the 32-bit libfdk-aac that Steam needs
+      nonfree: negativo17
     install:
       packages:
+        # Fedora packages Terra doesn't carry
         - nodejs
         - npm
+        - uv
+        - mpv
+        - yt-dlp
+        - kitty
+        - btop
+        - gdu
+        - nvtop
+        - kde-connect
+        - kdeconnectd
+        - qbittorrent
+        - wireshark
+        # Terra packages
+        - zed
+        - ghostty
+        - bun-bin
+        - deno
+        - mise
+        - faugus-launcher
+        # Steam needs the 32-bit libfdk-aac; the base only ships the 64-bit one
+        - libfdk-aac.i686
         # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
         - https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm
+
+  - type: dnf
+    repos:
+      nonfree: rpmfusion
+    install:
+      install-weak-deps: false # matches Bazzite's Steam install
+      packages:
+        - steam
 
   - type: default-flatpaks
     configurations:
@@ -31,11 +70,17 @@ modules:
         scope: system
         # If no repo information is specified, Flathub will be used by default
         install:
-          - dev.zed.Zed
+          # no current native package; Unity's own RPM repo is stuck on 3.15.2
           - com.unity.UnityHub
       - scope: user # Also add Flathub user repo, but no user packages
 
+  - type: justfiles
+    validate: true
+    install: true
+
   - type: script
+    scripts:
+      - install-extra-tools.sh
     snippets:
       - npm install -g @anthropic-ai/claude-code @openai/codex
       - claude --version && codex --version # fail the build if the CLIs are not on PATH
