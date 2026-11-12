@@ -25,7 +25,7 @@ Preinstalled:
 
 The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled.
 Steam is installed natively from Terra, with the 32-bit `libfdk-aac` from negativo17 that Bazzite
-also uses. Unity Hub is the official native RPM, resolved from Unity's versioned CDN.
+also uses. Unity Hub is the official 3.22.6 native RPM, pinned with a checksum.
 
 ## Runtime setup
 
@@ -45,8 +45,8 @@ Android development:
 ujust setup-android-studio
 ```
 
-Installs the latest stable Android Studio to `~/.local/opt/android-studio`, creates the `studio`
-launcher and desktop entry, and adds you to the `adbusers` and `kvm` groups. The image already ships
+Installs Android Studio 2026.2.2.9 (pinned for its checksum; bump the recipe to update), creates the
+`studio` launcher and desktop entry, and adds you to the `adbusers` and `kvm` groups. The image already ships
 `android-tools`, the Android udev rules, and KVM support, so no layering or reboot is needed; log out
 and back in for the groups to apply. The SDK wizard installs the SDK to `~/Android/Sdk`.
 
