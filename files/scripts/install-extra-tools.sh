@@ -42,15 +42,10 @@ unity_sha="ed711890f67bea71a99d37e2887f51c8ba41a5be894a3f5cadc7bbf518840b9d"
 unity_rpm="UnityHubSetup-${unity_version}-x86_64.rpm"
 curl -fsSL -o "$tmp/$unity_rpm" "https://public-cdn.cloud.unity3d.com/hub/prod/${unity_version}/${unity_rpm}"
 echo "${unity_sha}  $tmp/$unity_rpm" | sha256sum -c -
-# shortcut: the RPM %post hangs in the build, so it is skipped here. The
-# sandbox bit and launcher are set below; the app is not launched in CI.
+# shortcut: the RPM %posttrans hangs in the build (it adds Unity's update repo
+# and runs yum check-update), so it is skipped. Hub self-update stays off; the
+# app is not launched in CI.
 timeout 600 dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
-if [ -d /opt/unityhub ]; then
-    find /opt/unityhub -name chrome-sandbox -exec chmod 4755 {} +
-fi
-if [ ! -e /usr/bin/unityhub ] && [ -x /opt/unityhub/unityhub ]; then
-    ln -s /opt/unityhub/unityhub /usr/bin/unityhub
-fi
 rpm -q unityhub
 
 # Blocky DNS proxy.

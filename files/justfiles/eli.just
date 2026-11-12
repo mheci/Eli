@@ -77,7 +77,8 @@ setup: setup-groups setup-kdeconnect
 # Install Android Studio and set up adb, udev rules and KVM access.
 setup-android-studio:
     #!/usr/bin/env bash
-    # shortcut: pinned for checksum; bump version, URL and SHA together to update.
+    # shortcut: pinned for checksum; bump version, URL and SHA together. A newer
+    # local install is replaced by this pin.
     set -euo pipefail
 
     tmp="$(mktemp -d)"
@@ -101,6 +102,7 @@ setup-android-studio:
         mkdir -p "$HOME/.local/opt"
         mkdir -p "$tmp/extract"
         tar -xzf "$tmp/studio.tar.gz" -C "$tmp/extract"
+        [ -d "$tmp/extract/android-studio" ] || { echo "Unexpected Android Studio archive layout."; exit 1; }
         rm -rf "$HOME/.local/opt/android-studio"
         mv "$tmp/extract/android-studio" "$HOME/.local/opt/android-studio"
         echo "Installed Android Studio $version."
