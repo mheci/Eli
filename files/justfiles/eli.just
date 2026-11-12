@@ -27,12 +27,6 @@ setup-kdeconnect:
     sudo firewall-cmd --reload
     echo "Opened KDE Connect ports 1714-1764."
 
-# Install the configured system Flatpaks now instead of at first boot.
-setup-flatpaks:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    sudo bluebuild-flatpak-manager apply system
-
 # Restart PipeWire so the RNNoise Noise Canceling source appears.
 setup-noise-suppression:
     #!/usr/bin/env bash
@@ -78,7 +72,7 @@ setup-blocky:
     echo "Blocky is running on port 53. Point your DNS at 127.0.0.1."
 
 # Run every runtime setup step once.
-setup: setup-groups setup-kdeconnect setup-flatpaks
+setup: setup-groups setup-kdeconnect
 
 # Install the latest stable Android Studio and set up adb, udev rules and KVM access.
 setup-android-studio:

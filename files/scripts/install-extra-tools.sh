@@ -4,9 +4,9 @@ set -euo pipefail
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-# shortcut: Spotifast, Blocky, SCSKiller and OpenCode follow upstream latest;
-# a bad release can enter the next build. Pin versions + Renovate if full
-# reproducibility matters.
+# shortcut: Spotifast, Blocky, SCSKiller, OpenCode and Unity Hub follow
+# upstream latest; a bad release can enter the next build. Pin versions +
+# Renovate if full reproducibility matters.
 
 # SCSKiller ships a Linux AppImage; the desktop file lives in files/system.
 curl -fsSL -o "$tmp/SCSKiller-x86_64.AppImage" https://github.com/BlueHeisenberg/SCSKiller/releases/latest/download/SCSKiller-x86_64.AppImage
@@ -34,6 +34,13 @@ curl -fsSL -o "$tmp/spotifast.sha" "https://github.com/crmne/spotifast/releases/
 (cd "$tmp" && grep " $spotifast_name$" spotifast.sha | sha256sum -c -)
 dnf install -y "$tmp/$spotifast_name"
 rpm -q spotifast
+
+# Unity Hub native RPM.
+unity_version="$(curl -fsSL https://public-cdn.cloud.unity3d.com/hub/prod/latest-linux.yml | awk '/^version:/{print $2; exit}')"
+unity_rpm="UnityHubSetup-${unity_version}-x86_64.rpm"
+curl -fsSL -o "$tmp/$unity_rpm" "https://public-cdn.cloud.unity3d.com/hub/prod/${unity_version}/${unity_rpm}"
+dnf install -y "$tmp/$unity_rpm"
+rpm -q unityhub
 
 # Blocky DNS proxy.
 blocky_tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/0xERR0R/blocky/releases/latest | sed 's|.*/tag/||')"
@@ -64,7 +71,7 @@ psd_dir="$(find "$tmp" -maxdepth 1 -type d -name 'profile-sync-daemon-*' -print 
 make -C "$psd_dir" install
 
 # Catch shell syntax errors in the runtime recipes before they ship.
-for recipe in setup-groups setup-kdeconnect setup-flatpaks setup-noise-suppression setup-psd setup-blocky setup-android-studio setup-hermes; do
+for recipe in setup-groups setup-kdeconnect setup-noise-suppression setup-psd setup-blocky setup-android-studio setup-hermes; do
     just --justfile /usr/share/bluebuild/justfile --dry-run "$recipe" | bash -n
 done
 
