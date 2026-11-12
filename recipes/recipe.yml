@@ -83,16 +83,6 @@ modules:
       enabled:
         - bpftune.service
 
-  - type: default-flatpaks
-    configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
-        scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install:
-          # no current native package; Unity's own RPM repo is stuck on 3.15.2
-          - com.unity.UnityHub
-      - scope: user # Also add Flathub user repo, but no user packages
-
   - type: justfiles
     validate: true
     install: true

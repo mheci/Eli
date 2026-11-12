@@ -16,7 +16,7 @@ Preinstalled:
   [mise](https://mise.jdx.dev)
 - Gaming: [Steam](https://store.steampowered.com) (Terra),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
-  [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
+  [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (native RPM)
 - Media: mpv, ffmpeg, yt-dlp, qBittorrent, [Spotifast](https://github.com/crmne/spotifast) (native RPM),
   ffmpegthumbnailer
 - Audio: RNNoise microphone noise suppression via a PipeWire filter chain
@@ -25,8 +25,7 @@ Preinstalled:
 
 The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled.
 Steam is installed natively from Terra, with the 32-bit `libfdk-aac` from negativo17 that Bazzite
-also uses. Unity Hub stays a Flatpak because Unity's own RPM repository is stuck on 3.15.2 while
-Flathub ships 3.22.6.
+also uses. Unity Hub is the official native RPM, resolved from Unity's versioned CDN.
 
 ## Runtime setup
 
@@ -36,10 +35,9 @@ After the first boot, run:
 ujust setup
 ```
 
-This adds your user to the `wireshark` group (and `libvirt`/`docker` if they exist), opens the KDE
-Connect firewall ports, and applies the configured Flatpaks immediately. Group changes need a log out
-and back in. The steps are also available separately as `ujust setup-groups`,
-`ujust setup-kdeconnect`, and `ujust setup-flatpaks`.
+This adds your user to the `wireshark` group (and `libvirt`/`docker` if they exist) and opens the KDE
+Connect firewall ports. Group changes need a log out and back in. The steps are also available
+separately as `ujust setup-groups` and `ujust setup-kdeconnect`.
 
 Android development:
 
