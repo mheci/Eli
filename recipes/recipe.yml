@@ -91,6 +91,7 @@ modules:
     scripts:
       - install-extra-tools.sh
     snippets:
+      # shortcut: the npm CLIs follow latest; the build checks both run.
       - npm install -g @anthropic-ai/claude-code @openai/codex
       - claude --version && codex --version # fail the build if the CLIs are not on PATH
 
