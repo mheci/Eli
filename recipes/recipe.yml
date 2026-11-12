@@ -18,17 +18,12 @@ modules:
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
 
   - type: dnf
-    repos:
-      keys:
-        # needed to verify the Unity Hub RPM signature
-        - https://hub.unity3d.com/linux/repos/rpm/stable/repodata/repomd.xml.key
     install:
       packages:
         - nodejs
         - npm
-        # stable URLs that always resolve to the latest release
-        - https://hub-dist.unity3d.com/artifactory/hub-rpm-prod-local/unity/stable/unityhub_x86_64/UnityHubSetup-x86_64.rpm
-        - https://github.com/anomalyco/opencode/releases/latest/download/opencode-desktop-linux-x86_64.rpm
+        # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
+        - https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm
 
   - type: default-flatpaks
     configurations:
@@ -37,6 +32,7 @@ modules:
         # If no repo information is specified, Flathub will be used by default
         install:
           - dev.zed.Zed
+          - com.unity.UnityHub
       - scope: user # Also add Flathub user repo, but no user packages
 
   - type: script
