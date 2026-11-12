@@ -33,5 +33,96 @@ setup-flatpaks:
     set -euo pipefail
     sudo bluebuild-flatpak-manager apply system
 
+# Restart PipeWire so the RNNoise Noise Canceling source appears.
+setup-noise-suppression:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -f /usr/lib64/ladspa/librnnoise_ladspa.so ]; then
+        echo "The RNNoise LADSPA plugin is missing from this image."
+        exit 1
+    fi
+    systemctl --user restart pipewire.service wireplumber.service
+    echo "Restarted PipeWire. Select 'Noise Canceling source' as your microphone."
+
 # Run every runtime setup step once.
 setup: setup-groups setup-kdeconnect setup-flatpaks
+
+# Install the latest stable Android Studio and set up adb, udev rules and KVM access.
+setup-android-studio:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "$tmp"' EXIT
+
+    release="$(curl -fsSL https://jb.gg/android-studio-releases-list.json | jq -r '
+        [ .content.item[]
+          | select(.channel == "Release" or .channel == "Patch")
+          | . as $r
+          | ($r.download[] | select(.link | endswith("-linux.tar.gz")))
+          | {version: $r.version, url: .link, sha: .checksum}
+        ][0]
+        | "\(.version)\t\(.url)\t\(.sha)"
+    ')"
+    IFS=$'\t' read -r version url sha <<<"$release"
+
+    installed=""
+    if [ -f "$HOME/.local/opt/android-studio/product-info.json" ]; then
+        installed="$(jq -r '.version' "$HOME/.local/opt/android-studio/product-info.json" 2>/dev/null || true)"
+    fi
+
+    if [ "$installed" = "$version" ]; then
+        echo "Android Studio $version is already installed."
+    else
+        echo "Downloading Android Studio $version..."
+        curl -fL --progress-bar "$url" -o "$tmp/studio.tar.gz"
+        echo "$sha  $tmp/studio.tar.gz" | sha256sum -c -
+        mkdir -p "$HOME/.local/opt"
+        rm -rf "$HOME/.local/opt/android-studio"
+        tar -xzf "$tmp/studio.tar.gz" -C "$HOME/.local/opt"
+        echo "Installed Android Studio $version."
+    fi
+
+    launcher="$HOME/.local/opt/android-studio/bin/studio.sh"
+    [ -x "$launcher" ] || launcher="$HOME/.local/opt/android-studio/bin/studio"
+    icon="$HOME/.local/opt/android-studio/bin/studio.png"
+    [ -f "$icon" ] || icon="android-studio"
+
+    mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications"
+    ln -sf "$launcher" "$HOME/.local/bin/studio"
+    cat > "$HOME/.local/share/applications/android-studio.desktop" <<EOF
+    [Desktop Entry]
+    Type=Application
+    Name=Android Studio
+    Comment=Android development environment
+    Exec=$launcher %f
+    Icon=$icon
+    Terminal=false
+    Categories=Development;IDE;
+    StartupWMClass=jetbrains-studio
+    EOF
+
+    sudo groupadd -f adbusers
+    sudo groupadd -f kvm
+    for group in adbusers kvm; do
+        sudo usermod -aG "$group" "$USER"
+    done
+    sudo udevadm control --reload-rules
+
+    echo
+    echo "Android Studio $version is ready."
+    echo "Log out and back in for the adbusers and kvm groups to apply."
+    echo "The SDK wizard will install the SDK to ~/Android/Sdk."
+    if [ ! -e /dev/kvm ]; then
+        echo "Warning: /dev/kvm is missing. Enable VT-x/AMD-V in firmware for the emulator."
+    fi
+
+# Install the Hermes Agent CLI for the current user.
+setup-hermes:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --non-interactive
+    echo
+    echo "Hermes Agent installed. Reload your shell, then run: hermes setup --portal"
+
+alias setup-hermes-agent := setup-hermes
