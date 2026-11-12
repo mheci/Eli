@@ -50,7 +50,6 @@ modules:
         - deno
         - mise
         - faugus-launcher
-        - steam
         # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
         - https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm
 
@@ -62,7 +61,13 @@ modules:
         install:
           # no current native package; Unity's own RPM repo is stuck on 3.15.2
           - com.unity.UnityHub
+          # native Steam needs 32-bit pipewire/fdk-aac, which conflicts with the base's full-codec libfdk-aac
+          - com.valvesoftware.Steam
       - scope: user # Also add Flathub user repo, but no user packages
+
+  - type: justfiles
+    validate: true
+    install: true
 
   - type: script
     scripts:

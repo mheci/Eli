@@ -13,18 +13,31 @@ Preinstalled:
 - Dev: [OpenCode Desktop](https://opencode.ai/desktop), [Claude Code](https://claude.com/claude-code),
   [Codex](https://github.com/openai/codex), [Bun](https://bun.sh), [Deno](https://deno.com),
   [uv](https://docs.astral.sh/uv/), [mise](https://mise.jdx.dev)
-- Gaming: [Steam](https://store.steampowered.com) (Terra),
+- Gaming: [Steam](https://store.steampowered.com) (Flathub),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
 - Media: mpv, ffmpeg, yt-dlp, qBittorrent
 - Tools: btop, gdu, nvtop, KDE Connect, Wireshark
 
 The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled, so
-their packages can be layered on later. Unity Hub stays a Flatpak because Unity's own RPM repository is
-stuck on 3.15.2 while Flathub ships 3.22.6.
+their packages can be layered on later. Steam and Unity Hub stay Flatpaks for two concrete reasons:
+native Steam needs 32-bit pipewire/fdk-aac, which conflicts with the base image's full-codec
+`libfdk-aac`, and Unity's own RPM repository is stuck on 3.15.2 while Flathub ships 3.22.6.
 
-To capture packets in Wireshark without root, join the `wireshark` group once:
-`sudo usermod -aG wireshark $USER` (log out and back in).
+## Runtime setup
+
+After the first boot, run:
+
+```
+ujust setup
+```
+
+This adds your user to the `wireshark` group (and `libvirt`/`docker` if they exist), opens the KDE
+Connect firewall ports, and applies the configured Flatpaks immediately. Group changes need a log out
+and back in. The steps are also available separately as `ujust setup-groups`,
+`ujust setup-kdeconnect`, and `ujust setup-flatpaks`.
+
+To capture packets in Wireshark without root, `ujust setup-groups` handles the group membership.
 
 ## Installation
 
