@@ -8,16 +8,20 @@ kernel modules).
 
 Preinstalled:
 
-- Terminals: [Ghostty](https://ghostty.org), [Kitty](https://sw.kovidgoyal.net/kitty/)
-- Editor: [Zed](https://zed.dev) (Flathub)
+- Terminals: [Ghostty](https://ghostty.org) (Terra), [Kitty](https://sw.kovidgoyal.net/kitty/)
+- Editor: [Zed](https://zed.dev) (Terra)
 - Dev: [OpenCode Desktop](https://opencode.ai/desktop), [Claude Code](https://claude.com/claude-code),
   [Codex](https://github.com/openai/codex), [Bun](https://bun.sh), [Deno](https://deno.com),
   [uv](https://docs.astral.sh/uv/), [mise](https://mise.jdx.dev)
-- Gaming: [Steam](https://store.steampowered.com) (Flathub),
-  [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Flathub),
+- Gaming: [Steam](https://store.steampowered.com) (Terra),
+  [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
 - Media: mpv, ffmpeg, yt-dlp, qBittorrent
 - Tools: btop, gdu, nvtop, KDE Connect, Wireshark
+
+The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled, so
+their packages can be layered on later. Unity Hub stays a Flatpak because Unity's own RPM repository is
+stuck on 3.15.2 while Flathub ships 3.22.6.
 
 To capture packets in Wireshark without root, join the `wireshark` group once:
 `sudo usermod -aG wireshark $USER` (log out and back in).

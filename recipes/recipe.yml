@@ -17,22 +17,24 @@ modules:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
 
+  - type: script
+    snippets:
+      # Terra's repo has repo_gpgcheck=1, so the key must be in the rpmdb before dnf reads it
+      - curl -fsSL "https://repos.fyralabs.com/terra$(rpm -E %fedora)/key.asc" | rpm --import -
+
   - type: dnf
     repos:
-      copr:
-        - jdxcode/mise
-        - scottames/ghostty # official Fedora source recommended by ghostty.org
+      files:
+        - https://raw.githubusercontent.com/terrapkg/subatomic-repos/main/terra.repo
+      nonfree: rpmfusion
     install:
       packages:
+        # Fedora packages Terra doesn't carry
         - nodejs
         - npm
-        - unzip
         - uv
-        - mise
         - mpv
-        - ffmpeg # full ffmpeg is already provided by the base image
         - yt-dlp
-        - ghostty
         - kitty
         - btop
         - gdu
@@ -41,6 +43,14 @@ modules:
         - kdeconnectd
         - qbittorrent
         - wireshark
+        # Terra packages
+        - zed
+        - ghostty
+        - bun-bin
+        - deno
+        - mise
+        - faugus-launcher
+        - steam
         # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
         - https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm
 
@@ -50,10 +60,8 @@ modules:
         scope: system
         # If no repo information is specified, Flathub will be used by default
         install:
-          - dev.zed.Zed
+          # no current native package; Unity's own RPM repo is stuck on 3.15.2
           - com.unity.UnityHub
-          - com.valvesoftware.Steam
-          - io.github.Faugus.faugus-launcher
       - scope: user # Also add Flathub user repo, but no user packages
 
   - type: script
