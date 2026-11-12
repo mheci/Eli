@@ -4,9 +4,9 @@ set -euo pipefail
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-# shortcut: Spotifast, Blocky, SCSKiller, OpenCode and Unity Hub follow
-# upstream latest; a bad release can enter the next build. Pin versions +
-# Renovate if full reproducibility matters.
+# shortcut: Spotifast, Blocky, SCSKiller and OpenCode follow upstream latest;
+# a bad release can enter the next build. Pin versions + Renovate if full
+# reproducibility matters.
 
 # SCSKiller ships a Linux AppImage; the desktop file lives in files/system.
 curl -fsSL -o "$tmp/SCSKiller-x86_64.AppImage" https://github.com/BlueHeisenberg/SCSKiller/releases/latest/download/SCSKiller-x86_64.AppImage
@@ -35,19 +35,16 @@ curl -fsSL -o "$tmp/spotifast.sha" "https://github.com/crmne/spotifast/releases/
 dnf install -y "$tmp/$spotifast_name"
 rpm -q spotifast
 
-# Unity Hub native RPM.
-unity_version="$(curl -fsSL https://public-cdn.cloud.unity3d.com/hub/prod/latest-linux.yml | awk '/^version:/{print $2; exit}')"
+# Unity Hub native RPM. Pin the version and hash so the signed image does not
+# trust whatever the CDN serves.
+unity_version="3.22.6"
+unity_sha="ed711890f67bea71a99d37e2887f51c8ba41a5be894a3f5cadc7bbf518840b9d"
 unity_rpm="UnityHubSetup-${unity_version}-x86_64.rpm"
 curl -fsSL -o "$tmp/$unity_rpm" "https://public-cdn.cloud.unity3d.com/hub/prod/${unity_version}/${unity_rpm}"
-# The 3.22 RPM's scriptlet waits on a desktop session; install files only and
-# set the Electron sandbox bit ourselves.
-timeout 600 dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
-if [ -d /opt/unityhub ]; then
-    find /opt/unityhub -name chrome-sandbox -exec chmod 4755 {} +
-fi
-if [ ! -e /usr/bin/unityhub ] && [ -x /opt/unityhub/unityhub ]; then
-    ln -s /opt/unityhub/unityhub /usr/bin/unityhub
-fi
+echo "${unity_sha}  $tmp/$unity_rpm" | sha256sum -c -
+# shortcut: the RPM %posttrans hangs in the build (it adds Unity's update repo
+# and runs yum check-update), so it is skipped. The app is not launched in CI.
+dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
 rpm -q unityhub
 
 # Blocky DNS proxy.
@@ -62,7 +59,7 @@ install -Dm755 "$tmp/blocky/blocky" /usr/bin/blocky
 
 # OpenCode Desktop: take the newest GitHub release that ships the desktop RPM,
 # then verify the matching checksum before installing.
-opencode_release="$(curl -fsSL 'https://api.github.com/repos/anomalyco/opencode/releases?per_page=30' | jq -r 'first(.[] | select(any(.assets[]; .name == "opencode-desktop-linux-x86_64.rpm")))')"
+opencode_release="$(curl -fsSL 'https://api.github.com/repos/anomalyco/opencode/releases?per_page=100' | jq -r 'first(.[] | select(any(.assets[]; .name == "opencode-desktop-linux-x86_64.rpm")))')"
 opencode_tag="$(jq -r '.tag_name' <<<"$opencode_release")"
 opencode_url="$(jq -r 'first(.assets[] | select(.name == "opencode-desktop-linux-x86_64.rpm") | .browser_download_url)' <<<"$opencode_release")"
 curl -fsSL -o "$tmp/opencode-desktop-linux-x86_64.rpm" "$opencode_url"
@@ -79,6 +76,7 @@ psd_dir="$(find "$tmp" -maxdepth 1 -type d -name 'profile-sync-daemon-*' -print 
 make -C "$psd_dir" install
 
 # Catch shell syntax errors in the runtime recipes before they ship.
+# shortcut: syntax only; the systemd and desktop steps need a live session.
 for recipe in setup-groups setup-kdeconnect setup-noise-suppression setup-psd setup-blocky setup-android-studio setup-hermes; do
     just --justfile /usr/share/bluebuild/justfile --dry-run "$recipe" | bash -n
 done

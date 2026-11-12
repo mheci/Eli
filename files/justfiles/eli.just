@@ -71,43 +71,37 @@ setup-blocky:
     sudo systemctl enable --now blocky.service
     echo "Blocky is running on port 53. Point your DNS at 127.0.0.1."
 
-# Run every runtime setup step once.
+# Run the default runtime setup steps once.
 setup: setup-groups setup-kdeconnect
 
-# Install the latest stable Android Studio and set up adb, udev rules and KVM access.
+# Install Android Studio and set up adb, udev rules and KVM access.
 setup-android-studio:
     #!/usr/bin/env bash
+    # shortcut: pinned for checksum; bump version, build, URL and SHA together. A newer
+    # local install is replaced by this pin.
     set -euo pipefail
 
     tmp="$(mktemp -d)"
     trap 'rm -rf "$tmp"' EXIT
 
-    release="$(curl -fsSL https://jb.gg/android-studio-releases-list.json | jq -r '
-        [ .content.item[]
-          | select(.channel == "Release" or .channel == "Patch")
-          | . as $r
-          | ($r.download[] | select(.link | endswith("-linux.tar.gz")))
-          | {version: $r.version, url: .link, sha: .checksum}
-        ][0]
-        | "\(.version)\t\(.url)\t\(.sha)"
-    ')"
-    IFS=$'\t' read -r version url sha <<<"$release"
+    version="2026.2.2.9"
+    build="AI-262.10968.63.2622.16840690"
+    url="https://edgedl.me.gvt1.com/android/studio/ide-zips/${version}/android-studio-rabbit2-patch1-linux.tar.gz"
+    sha="11ecbf0e6dc0f04a1353f797e45bf239a3ff1a82221539b1b8cdd7eab0d8d8ea"
 
-    installed=""
-    if [ -f "$HOME/.local/opt/android-studio/product-info.json" ]; then
-        installed="$(jq -r '.version' "$HOME/.local/opt/android-studio/product-info.json" 2>/dev/null || true)"
-    fi
+    installed="$(cat "$HOME/.local/opt/android-studio/build.txt" 2>/dev/null || true)"
 
-    if [ "$installed" = "$version" ]; then
+    if [ "$installed" = "$build" ]; then
         echo "Android Studio $version is already installed."
     else
         echo "Downloading Android Studio $version..."
         curl -fL --progress-bar "$url" -o "$tmp/studio.tar.gz"
         echo "$sha  $tmp/studio.tar.gz" | sha256sum -c -
         mkdir -p "$HOME/.local/opt"
-        rm -rf "$tmp/extract"
         mkdir -p "$tmp/extract"
         tar -xzf "$tmp/studio.tar.gz" -C "$tmp/extract"
+        [ -d "$tmp/extract/android-studio" ] || { echo "Unexpected Android Studio archive layout."; exit 1; }
+        [ "$(cat "$tmp/extract/android-studio/build.txt")" = "$build" ] || { echo "Unexpected Android Studio build."; exit 1; }
         rm -rf "$HOME/.local/opt/android-studio"
         mv "$tmp/extract/android-studio" "$HOME/.local/opt/android-studio"
         echo "Installed Android Studio $version."
@@ -120,6 +114,7 @@ setup-android-studio:
 
     mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications"
     ln -sf "$launcher" "$HOME/.local/bin/studio"
+    echo "If 'studio' is not found in your terminal, add ~/.local/bin to PATH."
     cat > "$HOME/.local/share/applications/android-studio.desktop" <<EOF
     [Desktop Entry]
     Type=Application
@@ -132,8 +127,6 @@ setup-android-studio:
     StartupWMClass=jetbrains-studio
     EOF
 
-    sudo groupadd -f adbusers
-    sudo groupadd -f kvm
     for group in adbusers kvm; do
         sudo usermod -aG "$group" "$USER"
     done
@@ -150,6 +143,7 @@ setup-android-studio:
 # Install the Hermes Agent CLI for the current user.
 setup-hermes:
     #!/usr/bin/env bash
+    # shortcut: the official installer has no published checksum; it runs as the user.
     set -euo pipefail
     curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --non-interactive
     echo

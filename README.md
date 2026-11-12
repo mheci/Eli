@@ -17,15 +17,14 @@ Preinstalled:
 - Gaming: [Steam](https://store.steampowered.com) (Terra),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (native RPM)
-- Media: mpv, ffmpeg, yt-dlp, qBittorrent, [Spotifast](https://github.com/crmne/spotifast) (native RPM),
-  ffmpegthumbnailer
+- Media: mpv, ffmpeg, yt-dlp, qBittorrent, [Spotifast](https://github.com/crmne/spotifast) (native RPM)
 - Audio: RNNoise microphone noise suppression via a PipeWire filter chain
 - Files: PCManFM-Qt with GVFS/MTP, KIO FUSE and KIO Extras
 - Tools: btop, gdu, nvtop, KDE Connect, Wireshark, bpftune, Blocky, profile-sync-daemon
 
 The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled.
 Steam is installed natively from Terra, with the 32-bit `libfdk-aac` from negativo17 that Bazzite
-also uses. Unity Hub is the official native RPM, resolved from Unity's versioned CDN.
+also uses. Unity Hub is the official 3.22.6 native RPM, pinned with a checksum.
 
 ## Runtime setup
 
@@ -45,10 +44,11 @@ Android development:
 ujust setup-android-studio
 ```
 
-Installs the latest stable Android Studio to `~/.local/opt/android-studio`, creates the `studio`
-launcher and desktop entry, and adds you to the `adbusers` and `kvm` groups. The image already ships
-`android-tools`, the Android udev rules, and KVM support, so no layering or reboot is needed; log out
-and back in for the groups to apply. The SDK wizard installs the SDK to `~/Android/Sdk`.
+Installs Android Studio 2026.2.2.9 (pinned for its checksum; bump version, build, URL and SHA
+together; an in-IDE update is replaced by the pin), creates the `studio` launcher and desktop entry,
+and adds you to the `adbusers` and `kvm` groups. The image already ships `android-tools`, the Android
+udev rules, and KVM support, so no layering or reboot is needed; log out and back in for the groups to
+apply. The SDK wizard installs the SDK to `~/Android/Sdk`.
 
 AI agents:
 
