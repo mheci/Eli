@@ -17,7 +17,7 @@ Preinstalled:
 - Gaming: [Steam](https://store.steampowered.com) (Terra),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
-- Media: mpv, ffmpeg, yt-dlp, qBittorrent
+- Media: mpv, ffmpeg, yt-dlp, qBittorrent, [Spotifast](https://github.com/crmne/spotifast) (native RPM)
 - Audio: RNNoise microphone noise suppression via a PipeWire filter chain
 - Tools: btop, gdu, nvtop, KDE Connect, Wireshark
 
