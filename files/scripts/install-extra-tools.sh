@@ -45,12 +45,13 @@ mkdir -p "$tmp/blocky"
 tar -xzf "$tmp/$blocky_name" -C "$tmp/blocky"
 install -Dm755 "$tmp/blocky/blocky" /usr/bin/blocky
 
-# OpenCode Desktop: the official endpoint gives the current version; verify the
-# matching GitHub release checksum before installing.
-opencode_url="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm)"
-opencode_version="$(sed -n 's|.*/files/bin/\([^/]*\)/.*|\1|p' <<<"$opencode_url")"
-curl -fsSL -o "$tmp/opencode-desktop-linux-x86_64.rpm" "https://github.com/anomalyco/opencode/releases/download/v${opencode_version}/opencode-desktop-linux-x86_64.rpm"
-curl -fsSL -o "$tmp/opencode.sha" "https://github.com/anomalyco/opencode/releases/download/v${opencode_version}/SHA256SUMS"
+# OpenCode Desktop: take the newest GitHub release that ships the desktop RPM,
+# then verify the matching checksum before installing.
+opencode_release="$(curl -fsSL 'https://api.github.com/repos/anomalyco/opencode/releases?per_page=30' | jq -r 'first(.[] | select(any(.assets[]; .name == "opencode-desktop-linux-x86_64.rpm")))')"
+opencode_tag="$(jq -r '.tag_name' <<<"$opencode_release")"
+opencode_url="$(jq -r 'first(.assets[] | select(.name == "opencode-desktop-linux-x86_64.rpm") | .browser_download_url)' <<<"$opencode_release")"
+curl -fsSL -o "$tmp/opencode-desktop-linux-x86_64.rpm" "$opencode_url"
+curl -fsSL -o "$tmp/opencode.sha" "https://github.com/anomalyco/opencode/releases/download/${opencode_tag}/SHA256SUMS"
 (cd "$tmp" && grep ' opencode-desktop-linux-x86_64.rpm$' opencode.sha | sha256sum -c -)
 dnf install -y "$tmp/opencode-desktop-linux-x86_64.rpm"
 
