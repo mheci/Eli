@@ -35,6 +35,7 @@ modules:
         - npm
         - git
         - jq
+        - unzip # extracts the RNNoise release zip
         - libatomic # Hermes' managed Node links this
         - android-tools # adb and fastboot for the Android Studio recipe
         - qemu-kvm # /dev/kvm and the kvm group for the emulator

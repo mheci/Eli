@@ -17,6 +17,7 @@ Preinstalled:
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
 - Media: mpv, ffmpeg, yt-dlp, qBittorrent
+- Audio: RNNoise microphone noise suppression via a PipeWire filter chain
 - Tools: btop, gdu, nvtop, KDE Connect, Wireshark
 
 The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled.
@@ -56,6 +57,11 @@ ujust setup-hermes
 
 Installs the [Hermes Agent](https://github.com/NousResearch/hermes-agent) CLI for the current user,
 then prints the command to run its setup wizard.
+
+Microphone noise suppression is provided by
+[noise-suppression-for-voice](https://github.com/werman/noise-suppression-for-voice). Pick
+**Noise Canceling source** as the input in your app or desktop settings. After an image update,
+`ujust setup-noise-suppression` restarts PipeWire so the source is reloaded.
 
 To capture packets in Wireshark without root, `ujust setup-groups` handles the group membership.
 

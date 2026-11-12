@@ -33,6 +33,17 @@ setup-flatpaks:
     set -euo pipefail
     sudo bluebuild-flatpak-manager apply system
 
+# Restart PipeWire so the RNNoise Noise Canceling source appears.
+setup-noise-suppression:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -f /usr/lib64/ladspa/librnnoise_ladspa.so ]; then
+        echo "The RNNoise LADSPA plugin is missing from this image."
+        exit 1
+    fi
+    systemctl --user restart pipewire.service wireplumber.service
+    echo "Restarted PipeWire. Select 'Noise Canceling source' as your microphone."
+
 # Run every runtime setup step once.
 setup: setup-groups setup-kdeconnect setup-flatpaks
 
