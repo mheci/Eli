@@ -8,10 +8,19 @@ kernel modules).
 
 Preinstalled:
 
-- [OpenCode Desktop](https://opencode.ai/desktop)
-- [Unity Hub](https://unity.com/unity-hub)
-- [Zed](https://zed.dev) (Flathub)
-- [Claude Code](https://claude.com/claude-code) and [Codex](https://github.com/openai/codex) CLIs
+- Terminals: [Ghostty](https://ghostty.org), [Kitty](https://sw.kovidgoyal.net/kitty/)
+- Editor: [Zed](https://zed.dev) (Flathub)
+- Dev: [OpenCode Desktop](https://opencode.ai/desktop), [Claude Code](https://claude.com/claude-code),
+  [Codex](https://github.com/openai/codex), [Bun](https://bun.sh), [Deno](https://deno.com),
+  [uv](https://docs.astral.sh/uv/), [mise](https://mise.jdx.dev)
+- Gaming: [Steam](https://store.steampowered.com) (Flathub),
+  [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Flathub),
+  [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
+- Media: mpv, ffmpeg, yt-dlp, qBittorrent
+- Tools: btop, gdu, nvtop, KDE Connect, Wireshark
+
+To capture packets in Wireshark without root, join the `wireshark` group once:
+`sudo usermod -aG wireshark $USER` (log out and back in).
 
 ## Installation
 

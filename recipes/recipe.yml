@@ -18,10 +18,29 @@ modules:
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
 
   - type: dnf
+    repos:
+      copr:
+        - jdxcode/mise
+        - scottames/ghostty # official Fedora source recommended by ghostty.org
     install:
       packages:
         - nodejs
         - npm
+        - unzip
+        - uv
+        - mise
+        - mpv
+        - ffmpeg # full ffmpeg is already provided by the base image
+        - yt-dlp
+        - ghostty
+        - kitty
+        - btop
+        - gdu
+        - nvtop
+        - kde-connect
+        - kdeconnectd
+        - qbittorrent
+        - wireshark
         # opencode.ai's own "latest" endpoint; GitHub's latest tag still points at 1.x
         - https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm
 
@@ -33,9 +52,13 @@ modules:
         install:
           - dev.zed.Zed
           - com.unity.UnityHub
+          - com.valvesoftware.Steam
+          - io.github.Faugus.faugus-launcher
       - scope: user # Also add Flathub user repo, but no user packages
 
   - type: script
+    scripts:
+      - install-extra-tools.sh
     snippets:
       - npm install -g @anthropic-ai/claude-code @openai/codex
       - claude --version && codex --version # fail the build if the CLIs are not on PATH
