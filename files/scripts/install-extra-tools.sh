@@ -39,7 +39,15 @@ rpm -q spotifast
 unity_version="$(curl -fsSL https://public-cdn.cloud.unity3d.com/hub/prod/latest-linux.yml | awk '/^version:/{print $2; exit}')"
 unity_rpm="UnityHubSetup-${unity_version}-x86_64.rpm"
 curl -fsSL -o "$tmp/$unity_rpm" "https://public-cdn.cloud.unity3d.com/hub/prod/${unity_version}/${unity_rpm}"
-dnf install -y "$tmp/$unity_rpm"
+# The 3.22 RPM's scriptlet waits on a desktop session; install files only and
+# set the Electron sandbox bit ourselves.
+timeout 600 dnf install -y --setopt=tsflags=noscripts "$tmp/$unity_rpm"
+if [ -d /opt/unityhub ]; then
+    find /opt/unityhub -name chrome-sandbox -exec chmod 4755 {} +
+fi
+if [ ! -e /usr/bin/unityhub ] && [ -x /opt/unityhub/unityhub ]; then
+    ln -s /opt/unityhub/unityhub /usr/bin/unityhub
+fi
 rpm -q unityhub
 
 # Blocky DNS proxy.
