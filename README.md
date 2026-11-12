@@ -17,9 +17,11 @@ Preinstalled:
 - Gaming: [Steam](https://store.steampowered.com) (Terra),
   [Faugus Launcher](https://github.com/Faugus/faugus-launcher) (Terra),
   [SCSKiller](https://github.com/BlueHeisenberg/SCSKiller), [Unity Hub](https://unity.com/unity-hub) (Flathub)
-- Media: mpv, ffmpeg, yt-dlp, qBittorrent, [Spotifast](https://github.com/crmne/spotifast) (native RPM)
+- Media: mpv, ffmpeg, yt-dlp, qBittorrent, [Spotifast](https://github.com/crmne/spotifast) (native RPM),
+  ffmpegthumbnailer
 - Audio: RNNoise microphone noise suppression via a PipeWire filter chain
-- Tools: btop, gdu, nvtop, KDE Connect, Wireshark
+- Files: PCManFM-Qt with GVFS/MTP, KIO FUSE and KIO Extras
+- Tools: btop, gdu, nvtop, KDE Connect, Wireshark, bpftune, Blocky, profile-sync-daemon
 
 The [Terra](https://terrapkg.com) and [RPM Fusion](https://rpmfusion.org) repositories are enabled.
 Steam is installed natively from Terra, with the 32-bit `libfdk-aac` from negativo17 that Bazzite
@@ -64,6 +66,13 @@ Microphone noise suppression is provided by
 **Noise Canceling source** as the input in your app or desktop settings. After an image update,
 `ujust setup-noise-suppression` restarts PipeWire so the source is reloaded.
 
+System services:
+
+- `ujust setup-psd` enables `psd.service` for your user and creates `~/.config/psd/psd.conf`.
+  Edit that file to choose browsers, then run `systemctl --user restart psd.service`.
+- `ujust setup-blocky` enables the Blocky DNS proxy on 127.0.0.1 if ports 53 and 4000 are free.
+  Edit `/etc/blocky/config.yml` first. Blocky is installed but disabled by default.
+
 To capture packets in Wireshark without root, `ujust setup-groups` handles the group membership.
 
 ## Installation
@@ -90,8 +99,8 @@ To rebase an existing atomic Fedora installation to the latest build:
   systemctl reboot
   ```
 
-The `latest` tag will automatically point to the latest build. That build will still always use the
-Fedora version specified in `recipe.yml`, so you won't get accidentally updated to the next major version.
+The `latest` tag points to the latest build. `image-version: latest` also follows the base image's
+current Fedora release, so a new Fedora major version arrives with the base image.
 
 > [!NOTE]
 > The BlueBuild base images sign the kernel and akmods with their own key. If Secure Boot is enabled

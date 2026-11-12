@@ -44,6 +44,39 @@ setup-noise-suppression:
     systemctl --user restart pipewire.service wireplumber.service
     echo "Restarted PipeWire. Select 'Noise Canceling source' as your microphone."
 
+# Set up profile-sync-daemon for the current user.
+setup-psd:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v psd >/dev/null; then
+        echo "profile-sync-daemon is not installed."
+        exit 1
+    fi
+    # The first start writes ~/.config/psd/psd.conf and exits; restart applies it.
+    systemctl --user enable --now psd.service
+    systemctl --user restart psd.service
+    echo "profile-sync-daemon is enabled. Edit ~/.config/psd/psd.conf to choose browsers, then run: systemctl --user restart psd.service"
+
+# Enable the Blocky DNS proxy if ports 53 and 4000 are free.
+setup-blocky:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v blocky >/dev/null; then
+        echo "Blocky is not installed."
+        exit 1
+    fi
+    for port in 53 4000; do
+        if ss -ltnH "sport = :$port" | grep -q . || ss -lunH "sport = :$port" | grep -q .; then
+            echo "Port $port is already in use:"
+            ss -ltnp "sport = :$port"
+            ss -lunp "sport = :$port"
+            echo "Free it (for example, disable the systemd-resolved stub listener) before enabling Blocky."
+            exit 1
+        fi
+    done
+    sudo systemctl enable --now blocky.service
+    echo "Blocky is running on port 53. Point your DNS at 127.0.0.1."
+
 # Run every runtime setup step once.
 setup: setup-groups setup-kdeconnect setup-flatpaks
 
@@ -78,8 +111,11 @@ setup-android-studio:
         curl -fL --progress-bar "$url" -o "$tmp/studio.tar.gz"
         echo "$sha  $tmp/studio.tar.gz" | sha256sum -c -
         mkdir -p "$HOME/.local/opt"
+        rm -rf "$tmp/extract"
+        mkdir -p "$tmp/extract"
+        tar -xzf "$tmp/studio.tar.gz" -C "$tmp/extract"
         rm -rf "$HOME/.local/opt/android-studio"
-        tar -xzf "$tmp/studio.tar.gz" -C "$HOME/.local/opt"
+        mv "$tmp/extract/android-studio" "$HOME/.local/opt/android-studio"
         echo "Installed Android Studio $version."
     fi
 

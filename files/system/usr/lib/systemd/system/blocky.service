@@ -1,0 +1,18 @@
+[Unit]
+Description=Blocky DNS proxy
+Documentation=https://0xerr0r.github.io/blocky/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+DynamicUser=yes
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+StateDirectory=blocky
+CacheDirectory=blocky
+ExecStart=/usr/bin/blocky --config /etc/blocky/config.yml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
